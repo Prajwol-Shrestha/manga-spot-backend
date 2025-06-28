@@ -9,11 +9,9 @@ import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { SignupDto } from './dtos/signup.dto';
 import { LoginDto } from './dtos/login.dto';
+import { ISafeUser } from 'src/types/user';
 
-type AuthInput = { username: string; password: string };
-type SignUpData = { userId: number; username: string };
-type SignInData = { userId: number; username: string };
-type AuthResult = { accessToken: string; userId: number; username: string };
+type AuthResult = { accessToken: string } & ISafeUser;
 
 @Injectable()
 export class AuthService {
@@ -33,28 +31,30 @@ export class AuthService {
     return this.signIn(user);
   }
 
-  async validateUser(input: LoginDto): Promise<SignInData | null> {
+  async validateUser(input: LoginDto): Promise<ISafeUser | null> {
     const user = await this.userService.findUserByName(input.username);
-    const isSamePassword = await bcrypt.compare(input.password, user.password);
-
-    if (user && isSamePassword) {
-      return {
-        userId: user.id,
-        username: user.username,
-      };
+    if (user) {
+      const isSamePassword = await bcrypt.compare(
+        input.password,
+        user.password,
+      );
+      const { password, ...safeUser } = user;
+      if (isSamePassword) {
+        return safeUser;
+      }
     }
     return null;
   }
 
-  async signIn(user: SignInData): Promise<AuthResult> {
+  async signIn(user: ISafeUser): Promise<AuthResult> {
     const tokenPayload = {
-      sub: user.userId,
+      sub: user.id,
       username: user.username,
     };
 
     const accessToken = await this.jwtService.signAsync(tokenPayload);
 
-    return { accessToken, username: user.username, userId: user.userId };
+    return { accessToken, ...user };
   }
 
   async signUp(user: SignupDto) {
