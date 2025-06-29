@@ -33,7 +33,7 @@ export class UserController {
 
   @Delete('me')
   @UseGuards(PassportJwtAuthGuard)
-  async deleteUser(@Request() request: ParameterDecorator) {
+  async deleteUser(@Request() request) {
     const username = request.user.username;
     const result = await this.userService.deleteUser(username);
     return result;

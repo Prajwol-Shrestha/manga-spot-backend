@@ -1,0 +1,116 @@
+import { Injectable } from '@nestjs/common';
+import { AxiosHttpService } from 'src/common/http/axios-http.service';
+import { ENDPOINTS } from 'src/constants/endpoints';
+import { MangaOutputDto } from './dtos/manga-output.dto';
+import {
+  getEnglishOrFirstProperty,
+  mapManga,
+  mapVolumeAndChapters,
+} from 'src/utils/manga-utils';
+import { GetMangaQueryDto } from './dtos/get-manga-query.dto';
+import { buildQueryParams } from 'src/utils/query-utils';
+import { MangaCollectionResponse, MangaEntityResponse } from 'src/types/manga';
+import { MangaVolumesResponse } from 'src/types/volume';
+import { TagListResponse } from 'src/types/tag';
+import { TagOutputDto } from './dtos/tag-output.dto';
+
+@Injectable()
+export class MangaService {
+  constructor(private readonly httpService: AxiosHttpService) {}
+
+  async getManga(query: GetMangaQueryDto): Promise<MangaOutputDto> {
+    try {
+      const queryParams = buildQueryParams(query);
+      const result = await this.httpService.get<MangaCollectionResponse>(
+        ENDPOINTS.getAllMangas,
+        {
+          params: queryParams,
+        },
+      );
+
+      const modifiedData = result?.data?.map((manga) => {
+        const transformedData = mapManga(manga);
+        return transformedData;
+      });
+      return { ...result, data: modifiedData };
+    } catch (error) {
+      console.log('error', error);
+      throw error;
+    }
+  }
+
+  async getManagaById(id: string) {
+    try {
+      const mangaDetailsPromise = this.httpService.get<MangaEntityResponse>(
+        ENDPOINTS.getMangaById.replace(':id', id),
+      );
+      const managaChaptersPromise = this.httpService.get<MangaVolumesResponse>(
+        ENDPOINTS.getMangaAggregate.replace(':id', id),
+      );
+      const [mangaDetails, managaChapters] = await Promise.all([
+        mangaDetailsPromise,
+        managaChaptersPromise,
+      ]);
+
+      const transformedMangaData = mapManga(mangaDetails?.data);
+      const transformedVolumeData = mapVolumeAndChapters(managaChapters);
+      const finalResponse = {
+        ...transformedMangaData,
+        volumes: transformedVolumeData,
+      };
+      console.log(transformedMangaData, 'mantransFormedMangaDatagaDetails');
+      console.log(transformedVolumeData, 'transformedVolumeData');
+      return finalResponse;
+    } catch (error) {
+      console.log('error', error);
+      throw error;
+    }
+  }
+
+  async getRandomManga() {
+    try {
+      const mangaData = await this.httpService.get<MangaEntityResponse>(
+        ENDPOINTS.getRandomManga,
+      );
+      const transformedData = mapManga(mangaData?.data);
+      const volumeDetails = await this.httpService.get<MangaVolumesResponse>(
+        ENDPOINTS.getMangaAggregate.replace(':id', transformedData.id),
+      );
+      const transformedVolumeData = mapVolumeAndChapters(volumeDetails);
+
+      const finalResponse = {
+        ...transformedData,
+        volumes: transformedVolumeData,
+      };
+      return finalResponse;
+    } catch (error) {
+      console.log('error', error);
+      throw error;
+    }
+  }
+
+  async getAllTags(): Promise<TagOutputDto[]> {
+    try {
+      const result = await this.httpService.get<TagListResponse>(
+        ENDPOINTS.getMangaTagList,
+      );
+      const transformed = result?.data?.map((tag) => {
+        const { id, type, attributes } = tag;
+        const { name, description, group } = attributes;
+        const cleanName = getEnglishOrFirstProperty(name);
+        const cleanDescription = getEnglishOrFirstProperty(description);
+        return {
+          id,
+          type,
+          group,
+          name: cleanName,
+          description: cleanDescription,
+        };
+      });
+      return transformed;
+    } catch (error) {
+      console.log('error', error);
+      throw error;
+    }
+  }
+}
