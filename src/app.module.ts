@@ -9,7 +9,13 @@ import { PrismaModule } from './prisma/prisma.module';
 import { MangaModule } from './manga/manga.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), AuthModule, UserModule, PrismaModule, MangaModule],
+  imports: [
+    ConfigModule.forRoot(),
+    AuthModule,
+    UserModule,
+    PrismaModule,
+    MangaModule,
+  ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
 })

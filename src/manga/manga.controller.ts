@@ -1,7 +1,9 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { MangaService } from './manga.service';
 import { GetMangaQueryDto } from './dtos/get-manga-query.dto';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
+@UseGuards(ThrottlerGuard)
 @Controller('manga')
 export class MangaController {
   constructor(private readonly mangaService: MangaService) {}
@@ -17,10 +19,10 @@ export class MangaController {
     const result = await this.mangaService.getRandomManga();
     return result;
   }
-    
-      @Get('tags')
-      async getTags() {
-        const result = await this.mangaService.getAllTags();
+
+  @Get('tags')
+  async getTags() {
+    const result = await this.mangaService.getAllTags();
     return result;
   }
 
@@ -39,6 +41,4 @@ export class MangaController {
   //   getMangaFeed() {
   //     return 'Manga manga feed';
   //   }
-
-
 }
