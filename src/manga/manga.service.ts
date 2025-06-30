@@ -6,6 +6,7 @@ import {
   getEnglishOrFirstProperty,
   mapManga,
   mapVolumeAndChapters,
+  transformChaptersData,
 } from 'src/utils/manga-utils';
 import { GetMangaQueryDto } from './dtos/get-manga-query.dto';
 import { buildQueryParams } from 'src/utils/query-utils';
@@ -13,6 +14,7 @@ import { MangaCollectionResponse, MangaEntityResponse } from 'src/types/manga';
 import { MangaVolumesResponse } from 'src/types/volume';
 import { TagListResponse } from 'src/types/tag';
 import { TagOutputDto } from './dtos/tag-output.dto';
+import { IChapterApiResponse } from 'src/types/chapter';
 
 @Injectable()
 export class MangaService {
@@ -112,6 +114,25 @@ export class MangaService {
         };
       });
       return transformed;
+    } catch (error) {
+      console.log('error', error);
+      throw error;
+    }
+  }
+
+  // not related to any specific manga
+  async getChapters(query: any):Promise<any> {
+    try {
+      const result = await this.httpService.get<IChapterApiResponse>(ENDPOINTS.getChaptersList, {
+        params: query
+      });
+      const transformedData = transformChaptersData(result?.data);
+
+      const finalResponse = {
+        ...result,
+        data: transformedData
+      }
+      return finalResponse;
     } catch (error) {
       console.log('error', error);
       throw error;

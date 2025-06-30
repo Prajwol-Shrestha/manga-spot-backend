@@ -1,5 +1,7 @@
+import { IChapterData } from 'src/types/chapter';
 import { MangaData } from 'src/types/manga';
 import { MangaVolumesResponse } from 'src/types/volume';
+import { transformTags } from './tag-utils';
 
 export const getEnglishOrFirstProperty = (obj: Record<string, any>): string => {
   return obj['en'] || obj[Object.keys(obj)[0]] || '';
@@ -23,28 +25,14 @@ export function mapManga(rawManga: MangaData) {
   const englishOrFirstTitle = getEnglishOrFirstProperty(title);
   const englishOrFirstDescription = getEnglishOrFirstProperty(description);
 
-  const modifiedTags =
-    tags?.map((tag) => {
-      const { id, type, attributes } = tag ?? {};
-      const { group, name, description } = attributes ?? {};
-      const cleanName = getEnglishOrFirstProperty(name);
-      const cleanDescription = getEnglishOrFirstProperty(description);
-
-      return {
-        id,
-        type,
-        group,
-        name: cleanName,
-        description: cleanDescription,
-      };
-    }) ?? [];
+  const modifiedTags = transformTags(tags);
 
   const meta = {
     author: '',
     artist: '',
     coverArt: '',
   };
-   relationships?.forEach((relation) => {
+  relationships?.forEach((relation) => {
     if (relation.type === 'author' && relation?.attributes) {
       meta.author = relation?.attributes.name || '';
     }
@@ -52,7 +40,9 @@ export function mapManga(rawManga: MangaData) {
       meta.artist = relation?.attributes.name || '';
     }
     if (relation.type === 'cover_art' && relation?.attributes) {
-      meta.coverArt = ` https://mangadex.org/covers/${id}/${relation?.attributes.fileName}` || '';
+      meta.coverArt =
+        ` https://mangadex.org/covers/${id}/${relation?.attributes.fileName}` ||
+        '';
     }
   });
 
@@ -109,4 +99,40 @@ export function mapVolumeAndChapters(
   }
 
   return result;
+}
+
+export function transformChaptersData(chapters: IChapterData[]) {
+  const transformed = chapters?.map((chapter) => {    
+    const { id: chapterId, attributes, relationships } = chapter ?? {};
+    const { translatedLanguage, externalUrl, isUnavailable, version, ...rest } =
+    attributes ?? {};
+    
+    const payload: Record<string, any> = {
+      ...rest,
+      id: chapterId
+    };
+
+    relationships?.forEach((relation) => {
+      if (relation.type === 'manga' && relation?.attributes) {
+        const mangaAttributes = relation?.attributes;
+        const manga = {
+          title: getEnglishOrFirstProperty(mangaAttributes.title),
+          description: getEnglishOrFirstProperty(mangaAttributes.description),
+          lastVolume: mangaAttributes.lastVolume,
+          lastChapter: mangaAttributes.lastChapter,
+          tags: transformTags(mangaAttributes.tags),
+          year: mangaAttributes.year,
+          status: mangaAttributes.status,
+          contentRating: mangaAttributes.contentRating,
+          createdAt: mangaAttributes.createdAt,
+          updatedAt: mangaAttributes.updatedAt,
+        };
+        payload.manga = manga;
+      }
+    });
+
+    return payload
+  });
+
+  return transformed
 }

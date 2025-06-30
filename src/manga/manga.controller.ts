@@ -21,6 +21,12 @@ export class MangaController {
     return result;
   }
 
+  @Get('latest-updated-chapters')
+  async getChapters(@Query() query: any) {
+    const result = await this.mangaService.getChapters(query);
+    return result;
+  }
+
   @Get('tags')
   async getTags() {
     const result = await this.mangaService.getAllTags();
