@@ -15,6 +15,7 @@ import { MangaVolumesResponse } from 'src/types/volume';
 import { TagListResponse } from 'src/types/tag';
 import { TagOutputDto } from './dtos/tag-output.dto';
 import { IChapterApiResponse } from 'src/types/chapter';
+import { ChapterOutputData } from './dtos/chapter-output.dto';
 
 @Injectable()
 export class MangaService {
@@ -121,7 +122,7 @@ export class MangaService {
   }
 
   // not related to any specific manga
-  async getChapters(query: any):Promise<any> {
+  async getChapters(query: any):Promise<ChapterOutputData> {
     try {
       const result = await this.httpService.get<IChapterApiResponse>(ENDPOINTS.getChaptersList, {
         params: query
