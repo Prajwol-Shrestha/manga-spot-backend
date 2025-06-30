@@ -130,6 +130,9 @@ export function transformChaptersData(chapters: IChapterData[]) {
         };
         payload.manga = manga;
       }
+      if(relation.type === 'scanlation_group' && relation?.attributes) {
+        payload.scanlator = relation?.attributes.name;
+      }
     });
 
     return payload

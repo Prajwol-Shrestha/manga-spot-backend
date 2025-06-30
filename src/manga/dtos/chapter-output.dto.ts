@@ -73,6 +73,9 @@ export class ChapterDataOutputDto {
 
   @ApiProperty({ type: MangaDto, required: false })
   manga?: MangaDto;
+
+  @ApiProperty()
+  scanlator?: string;
 }
 
 export class ChapterOutputData {
