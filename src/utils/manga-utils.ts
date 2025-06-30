@@ -6,7 +6,7 @@ export const getEnglishOrFirstProperty = (obj: Record<string, any>): string => {
 };
 
 export function mapManga(rawManga: MangaData) {
-  const { id, type, attributes } = rawManga ?? {};
+  const { id, type, attributes, relationships } = rawManga ?? {};
   const {
     title,
     description,
@@ -39,6 +39,23 @@ export function mapManga(rawManga: MangaData) {
       };
     }) ?? [];
 
+  const meta = {
+    author: '',
+    artist: '',
+    coverArt: '',
+  };
+   relationships?.forEach((relation) => {
+    if (relation.type === 'author' && relation?.attributes) {
+      meta.author = relation?.attributes.name || '';
+    }
+    if (relation.type === 'artist' && relation?.attributes) {
+      meta.artist = relation?.attributes.name || '';
+    }
+    if (relation.type === 'cover_art' && relation?.attributes) {
+      meta.coverArt = ` https://mangadex.org/covers/${id}/${relation?.attributes.fileName}` || '';
+    }
+  });
+
   return {
     id,
     type,
@@ -52,6 +69,7 @@ export function mapManga(rawManga: MangaData) {
     contentRating,
     createdAt,
     updatedAt,
+    ...meta,
   };
 }
 

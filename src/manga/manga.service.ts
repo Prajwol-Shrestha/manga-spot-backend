@@ -18,7 +18,7 @@ import { TagOutputDto } from './dtos/tag-output.dto';
 export class MangaService {
   constructor(private readonly httpService: AxiosHttpService) {}
 
-  async getManga(query: GetMangaQueryDto): Promise<MangaOutputDto> {
+  async getManga(query: any): Promise<MangaOutputDto> {
     try {
       const queryParams = buildQueryParams(query);
       const result = await this.httpService.get<MangaCollectionResponse>(
@@ -67,10 +67,14 @@ export class MangaService {
     }
   }
 
-  async getRandomManga() {
+  async getRandomManga(query: any) {
     try {
+      const queryParams = buildQueryParams(query);
       const mangaData = await this.httpService.get<MangaEntityResponse>(
         ENDPOINTS.getRandomManga,
+        {
+          params: queryParams,
+        },
       );
       const transformedData = mapManga(mangaData?.data);
       const volumeDetails = await this.httpService.get<MangaVolumesResponse>(
@@ -114,3 +118,5 @@ export class MangaService {
     }
   }
 }
+
+// https://mangadex.org/covers/124a996f-197f-4f03-b5dd-ea753e5ae423/2fd461f7-977d-467a-8cce-316102f0da5f.png.512.jpg

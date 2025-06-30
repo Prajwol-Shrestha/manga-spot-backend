@@ -9,14 +9,15 @@ export class MangaController {
   constructor(private readonly mangaService: MangaService) {}
 
   @Get()
-  async getAllManga(@Query() query: GetMangaQueryDto) {
+  async getAllManga(@Query() query: any) {
     const result = await this.mangaService.getManga(query);
     return result;
   }
 
   @Get('random')
-  async getRandomManga() {
-    const result = await this.mangaService.getRandomManga();
+  // TODO: DTO is rejecting query like includes[]=cover_art&includes[]=author
+  async getRandomManga(@Query() query: any) {
+    const result = await this.mangaService.getRandomManga(query);
     return result;
   }
 

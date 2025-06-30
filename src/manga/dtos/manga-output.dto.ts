@@ -32,5 +32,8 @@ export class MangaOutputDto {
     status: MangaStatus;
     contentRating: ContentRating;
     tags: TagOutputDto[];
+    author?: string;
+    artist?: string;
+    coverArt?: string;
   }[];
 }

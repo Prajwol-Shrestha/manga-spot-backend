@@ -69,6 +69,7 @@ export interface MangaRelationship {
   id: string;
   type: string;
   attributes?: {
+    name?: string
     description?: string;
     volume?: string;
     fileName?: string;
