@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AxiosHttpService } from 'src/common/http/axios-http.service';
 import { ENDPOINTS } from 'src/constants/endpoints';
-import { MangaOutputDto } from './dtos/manga-output.dto';
+import { ContentRating, MangaOutputDto } from './dtos/manga-output.dto';
 import {
   getEnglishOrFirstProperty,
   mapManga,
@@ -122,17 +122,49 @@ export class MangaService {
   }
 
   // not related to any specific manga
-  async getChapters(query: any):Promise<ChapterOutputData> {
+  async getChapters(query: any): Promise<ChapterOutputData> {
     try {
-      const result = await this.httpService.get<IChapterApiResponse>(ENDPOINTS.getChaptersList, {
-        params: query
-      });
+      const result = await this.httpService.get<IChapterApiResponse>(
+        ENDPOINTS.getChaptersList,
+        {
+          params: query,
+        },
+      );
+
       const transformedData = transformChaptersData(result?.data);
+      const mangaIds = transformedData.map(
+        (chapter) => chapter?.mangaId
+      );
+      console.log(mangaIds, 'mangaIds')
+
+      const params = {
+        limit: mangaIds.length,
+        offset: 0,
+        ids: mangaIds,
+        contentRating: [
+          ContentRating.SAFE,
+          ContentRating.SUGGESTIVE,
+          ContentRating.EROTICA,
+          ContentRating.PORNOGRAPHIC,
+        ],
+        includes: ['cover_art'],
+      };
+      const mangaData = await this.getManga(params);
+      const actualMangaData = mangaData?.data || [];
+
+      // map manga data with chapter data
+      const mappedData = transformedData.map((chapter) => {
+        const manga = actualMangaData.find((manga) => manga.id === chapter.mangaId);
+        return {
+          ...chapter,
+          manga,
+        };
+      })
 
       const finalResponse = {
         ...result,
-        data: transformedData
-      }
+        data: mappedData,
+      };
       return finalResponse;
     } catch (error) {
       console.log('error', error);

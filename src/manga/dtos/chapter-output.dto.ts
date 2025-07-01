@@ -13,6 +13,9 @@ export class MangaTagDto {
 
 export class MangaDto {
   @ApiProperty()
+  id: string;
+
+  @ApiProperty()
   title: string;
 
   @ApiProperty()
@@ -70,6 +73,9 @@ export class ChapterDataOutputDto {
 
   @ApiProperty()
   pages: number;
+
+  @ApiProperty()
+  mangaId: string;
 
   @ApiProperty({ type: MangaDto, required: false })
   manga?: MangaDto;

@@ -105,30 +105,33 @@ export function mapVolumeAndChapters(
 export function transformChaptersData(chapters: IChapterData[]) {
   const transformed = chapters?.map((chapter) => {    
     const { id: chapterId, attributes, relationships } = chapter ?? {};
-    const { translatedLanguage, externalUrl, isUnavailable, version, ...rest } =
+    const {translatedLanguage, externalUrl, isUnavailable, version, ...rest } =
     attributes ?? {};
     
     const payload: ChapterDataOutputDto = {
       ...rest,
-      id: chapterId
+      id: chapterId,
+      mangaId: ''
     };
 
     relationships?.forEach((relation) => {
-      if (relation.type === 'manga' && relation?.attributes) {
-        const mangaAttributes = relation?.attributes;
-        const manga = {
-          title: getEnglishOrFirstProperty(mangaAttributes.title),
-          description: getEnglishOrFirstProperty(mangaAttributes.description),
-          lastVolume: mangaAttributes.lastVolume,
-          lastChapter: mangaAttributes.lastChapter,
-          tags: transformTags(mangaAttributes.tags),
-          year: mangaAttributes.year,
-          status: mangaAttributes.status,
-          contentRating: mangaAttributes.contentRating,
-          createdAt: mangaAttributes.createdAt,
-          updatedAt: mangaAttributes.updatedAt,
-        };
-        payload.manga = manga;
+      if (relation.type === 'manga') {
+        payload.mangaId = relation?.id;
+        // const mangaAttributes = relation?.attributes;
+        // const manga = {
+        //   id: relation.id,
+        //   title: getEnglishOrFirstProperty(mangaAttributes.title),
+        //   description: getEnglishOrFirstProperty(mangaAttributes.description),
+        //   lastVolume: mangaAttributes.lastVolume,
+        //   lastChapter: mangaAttributes.lastChapter,
+        //   tags: transformTags(mangaAttributes.tags),
+        //   year: mangaAttributes.year,
+        //   status: mangaAttributes.status,
+        //   contentRating: mangaAttributes.contentRating,
+        //   createdAt: mangaAttributes.createdAt,
+        //   updatedAt: mangaAttributes.updatedAt,
+        // };
+        // payload.manga = manga;
       }
       if(relation.type === 'scanlation_group' && relation?.attributes) {
         payload.scanlator = relation?.attributes.name;

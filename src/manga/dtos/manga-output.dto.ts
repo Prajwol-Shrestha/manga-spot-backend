@@ -9,8 +9,8 @@ export enum MangaStatus {
 }
 
 export enum ContentRating {
-  SAFE = 'Safe',
-  SUGGESTIVE = 'Suggestive',
+  SAFE = 'safe',
+  SUGGESTIVE = 'suggestive',
   EROTICA = 'erotica',
   PORNOGRAPHIC = 'pornographic',
 }
