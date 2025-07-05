@@ -23,11 +23,10 @@ export class MangaService {
 
   async getManga(query: any): Promise<MangaOutputDto> {
     try {
-      const queryParams = buildQueryParams(query);
       const result = await this.httpService.get<MangaCollectionResponse>(
         ENDPOINTS.getAllMangas,
         {
-          params: queryParams,
+          params: query,
         },
       );
 
@@ -73,6 +72,7 @@ export class MangaService {
   async getRandomManga(query: any) {
     try {
       const queryParams = buildQueryParams(query);
+      console.log(queryParams, 'queryParamsqueryParams')
       const mangaData = await this.httpService.get<MangaEntityResponse>(
         ENDPOINTS.getRandomManga,
         {
@@ -135,8 +135,7 @@ export class MangaService {
       const mangaIds = transformedData.map(
         (chapter) => chapter?.mangaId
       );
-      console.log(mangaIds, 'mangaIds')
-
+      
       const params = {
         limit: mangaIds.length,
         offset: 0,
