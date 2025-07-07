@@ -7,6 +7,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaService } from './prisma/prisma.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { MangaModule } from './manga/manga.module';
+import { BookmarksModule } from './bookmarks/bookmarks.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { MangaModule } from './manga/manga.module';
     UserModule,
     PrismaModule,
     MangaModule,
+    BookmarksModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
