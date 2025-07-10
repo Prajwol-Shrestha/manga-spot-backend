@@ -9,7 +9,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
-import { PassportJwtAuthGuard } from 'src/auth/guards/passport-jwt.guard';
+import { JwtAuthGuard } from 'src/auth/guards/passport-jwt.guard';
 import { BookmarksService } from './bookmarks.service';
 
 @Controller('bookmarks')
@@ -17,7 +17,7 @@ export class BookmarksController {
   constructor(private readonly bookmarkService: BookmarksService) {}
 
   @Get()
-  @UseGuards(PassportJwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getAllBookmarks(@Request() req) {
     const userId = req.user.userId;
     const result = await this.bookmarkService.getAllBookmarks(userId);
@@ -25,7 +25,7 @@ export class BookmarksController {
   }
 
   @Post()
-  @UseGuards(PassportJwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async createBookmark(
     @Request() req,
     @Body() body: { mangaId: string; title: string; coverArt: string },

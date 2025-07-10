@@ -7,7 +7,7 @@ import {
   Patch,
   Body,
 } from '@nestjs/common';
-import { PassportJwtAuthGuard } from 'src/auth/guards/passport-jwt.guard';
+import { JwtAuthGuard } from 'src/auth/guards/passport-jwt.guard';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dtos/update-user.dto';
 
@@ -16,7 +16,7 @@ export class UserController {
   constructor(private userService: UserService) {}
 
   @Get('me')
-  @UseGuards(PassportJwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async getUserInfo(@Request() request) {
     const username = request.user.username;
     const result = await this.userService.findUserByName(username);
@@ -24,7 +24,7 @@ export class UserController {
   }
 
   @Patch('me')
-  @UseGuards(PassportJwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async updateProfile(@Request() request, @Body() input: UpdateUserDto) {
     const userId = request.user.userId;
     const result = await this.userService.updateUser(userId, input);
@@ -32,7 +32,7 @@ export class UserController {
   }
 
   @Delete('me')
-  @UseGuards(PassportJwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   async deleteUser(@Request() request) {
     const username = request.user.username;
     const result = await this.userService.deleteUser(username);
