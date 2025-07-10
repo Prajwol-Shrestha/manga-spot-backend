@@ -3,9 +3,11 @@ import { MangaController } from './manga.controller';
 import { MangaService } from './manga.service';
 import { HttpModule } from 'src/common/http/http.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { BookmarksModule } from 'src/bookmarks/bookmarks.module';
 
 @Module({
   imports: [
+    BookmarksModule,
     HttpModule,
     ThrottlerModule.forRoot({
       throttlers: [

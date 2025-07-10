@@ -1,7 +1,15 @@
-import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Query,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { MangaService } from './manga.service';
 import { GetMangaQueryDto } from './dtos/get-manga-query.dto';
 import { ThrottlerGuard } from '@nestjs/throttler';
+import { OptionalJwtAuthGuard } from 'src/auth/guards/optional-jwt.guard';
 
 @UseGuards(ThrottlerGuard)
 @Controller('manga')
@@ -9,15 +17,20 @@ export class MangaController {
   constructor(private readonly mangaService: MangaService) {}
 
   @Get()
-  async getAllManga(@Query() query?: any) {
-    const result = await this.mangaService.getManga(query);
+  @UseGuards(OptionalJwtAuthGuard)
+  async getAllManga(@Request() req: any, @Query() query?: any) {
+    const userId = await req?.user?.userId;
+    const result = await this.mangaService.getManga(query, userId);
     return result;
   }
 
-  @Get('random')
   // TODO: DTO is rejecting query like includes[]=cover_art&includes[]=author
-  async getRandomManga(@Query() query?: any) {
-    const result = await this.mangaService.getRandomManga(query);
+  @Get('random')
+      @UseGuards(OptionalJwtAuthGuard)
+  async getRandomManga(@Request() req: any, @Query() query?: any) {
+        const userId = await req?.user?.userId;
+
+    const result = await this.mangaService.getRandomManga(query, userId);
     return result;
   }
 
@@ -34,8 +47,11 @@ export class MangaController {
   }
 
   @Get(':id')
-  async getMangaById(@Param('id') id: string) {
-    const result = await this.mangaService.getManagaById(id);
+      @UseGuards(OptionalJwtAuthGuard)
+  async getMangaById(@Request() req: any, @Param('id') id: string) {
+        const userId = await req?.user?.userId;
+
+    const result = await this.mangaService.getManagaById(id, userId);
     return result;
   }
 

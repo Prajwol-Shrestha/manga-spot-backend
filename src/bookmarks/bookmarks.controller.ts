@@ -36,6 +36,7 @@ export class BookmarksController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   async deleteBookmark(@Request() req, @Param('id') id: string) {
     const userId = req.user.userId;
     const result = await this.bookmarkService.deleteBookmark(userId, id);

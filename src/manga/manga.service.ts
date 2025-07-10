@@ -16,13 +16,20 @@ import { TagListResponse } from 'src/types/tag';
 import { TagOutputDto } from './dtos/tag-output.dto';
 import { IChapterApiResponse } from 'src/types/chapter';
 import { ChapterOutputData } from './dtos/chapter-output.dto';
+import { BookmarksService } from 'src/bookmarks/bookmarks.service';
 
 @Injectable()
 export class MangaService {
-  constructor(private readonly httpService: AxiosHttpService) {}
+  constructor(
+    private readonly httpService: AxiosHttpService,
+    private readonly bookmarkService: BookmarksService,
+  ) {}
 
-  async getManga(query: any): Promise<MangaOutputDto> {
+  async getManga(query: any, userId?: string): Promise<MangaOutputDto> {
     try {
+      const bookmarks = await this.bookmarkService.getAllBookmarks(
+        userId || '',
+      );
       const result = await this.httpService.get<MangaCollectionResponse>(
         ENDPOINTS.getAllMangas,
         {
@@ -34,15 +41,27 @@ export class MangaService {
         const transformedData = mapManga(manga);
         return transformedData;
       });
-      return { ...result, data: modifiedData };
+      const bookmarkedFieldAddedData = modifiedData.map((manga) => {
+        const hasBookMarked = bookmarks.some(
+          (bookmark) => bookmark.mangaId === manga.id,
+        );
+        return {
+          ...manga,
+          bookmarkedByMe: hasBookMarked,
+        };
+      });
+      return { ...result, data: bookmarkedFieldAddedData };
     } catch (error) {
       console.log('error', error);
       throw error;
     }
   }
 
-  async getManagaById(id: string) {
+  async getManagaById(id: string, userId?: string) {
     try {
+      const bookmarks = await this.bookmarkService.getAllBookmarks(
+        userId || '',
+      );
       const mangaDetailsPromise = this.httpService.get<MangaEntityResponse>(
         ENDPOINTS.getMangaById.replace(':id', id),
       );
@@ -60,19 +79,25 @@ export class MangaService {
         ...transformedMangaData,
         volumes: transformedVolumeData,
       };
-      console.log(transformedMangaData, 'mantransFormedMangaDatagaDetails');
-      console.log(transformedVolumeData, 'transformedVolumeData');
-      return finalResponse;
+      const hasBookMarked = bookmarks.some(
+        (bookmark) => bookmark.mangaId === finalResponse.id,
+      );
+      return {
+        ...finalResponse,
+        bookmarkedByMe: hasBookMarked,
+      };
     } catch (error) {
       console.log('error', error);
       throw error;
     }
   }
 
-  async getRandomManga(query: any) {
+  async getRandomManga(query: any, userId?: string) {
     try {
+      const bookmarks = await this.bookmarkService.getAllBookmarks(
+        userId || '',
+      );
       const queryParams = buildQueryParams(query);
-      console.log(queryParams, 'queryParamsqueryParams')
       const mangaData = await this.httpService.get<MangaEntityResponse>(
         ENDPOINTS.getRandomManga,
         {
@@ -89,7 +114,13 @@ export class MangaService {
         ...transformedData,
         volumes: transformedVolumeData,
       };
-      return finalResponse;
+      const hasBookMarked = bookmarks.some(
+        (bookmark) => bookmark.mangaId === finalResponse.id,
+      );
+      return {
+        ...finalResponse,
+        bookmarkedByMe: hasBookMarked,
+      };
     } catch (error) {
       console.log('error', error);
       throw error;
@@ -132,10 +163,8 @@ export class MangaService {
       );
 
       const transformedData = transformChaptersData(result?.data);
-      const mangaIds = transformedData.map(
-        (chapter) => chapter?.mangaId
-      );
-      
+      const mangaIds = transformedData.map((chapter) => chapter?.mangaId);
+
       const params = {
         limit: mangaIds.length,
         offset: 0,
@@ -153,12 +182,14 @@ export class MangaService {
 
       // map manga data with chapter data
       const mappedData = transformedData.map((chapter) => {
-        const manga = actualMangaData.find((manga) => manga.id === chapter.mangaId);
+        const manga = actualMangaData.find(
+          (manga) => manga.id === chapter.mangaId,
+        );
         return {
           ...chapter,
           manga,
         };
-      })
+      });
 
       const finalResponse = {
         ...result,
