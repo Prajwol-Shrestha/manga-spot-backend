@@ -36,8 +36,10 @@ export class BookmarksService {
   async deleteBookmark(userId: string, mangaId: string) {
     const result = await this.prismaService.bookmark.delete({
       where: {
-        userId: userId,
-        id: mangaId,
+        userId_mangaId: {
+          userId: userId,
+          mangaId: mangaId,
+        },
       },
     });
     return result;

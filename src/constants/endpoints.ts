@@ -11,4 +11,6 @@ export const ENDPOINTS = {
 
   getAllScanlationGroups: '/group',
   getScanlationGroupById: '/group/:id',
+
+  getChapterPages: '/at-home/server/:chapterId'
 };

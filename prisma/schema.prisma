@@ -28,14 +28,13 @@ model User {
 }
 
 
-model Bookmark{
-  id    String @id @default(cuid()) @unique
-  user  User @relation(fields: [userId], references: [id])
-  userId  String
-  mangaId String
-  title   String
-  coverArt  String
+model Bookmark {
+  user     User   @relation(fields: [userId], references: [id])
+  userId   String
+  mangaId  String
+  title    String
+  coverArt String
   createdAt DateTime @default(now())
-  
-  @@unique([userId, mangaId])
+
+  @@id([userId, mangaId]) // Composite primary key
 }
