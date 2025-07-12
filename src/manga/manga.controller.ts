@@ -26,9 +26,9 @@ export class MangaController {
 
   // TODO: DTO is rejecting query like includes[]=cover_art&includes[]=author
   @Get('random')
-      @UseGuards(OptionalJwtAuthGuard)
+  @UseGuards(OptionalJwtAuthGuard)
   async getRandomManga(@Request() req: any, @Query() query?: any) {
-        const userId = await req?.user?.userId;
+    const userId = await req?.user?.userId;
 
     const result = await this.mangaService.getRandomManga(query, userId);
     return result;
@@ -47,11 +47,11 @@ export class MangaController {
   }
 
   @Get(':id')
-      @UseGuards(OptionalJwtAuthGuard)
-  async getMangaById(@Request() req: any, @Param('id') id: string) {
-        const userId = await req?.user?.userId;
+  @UseGuards(OptionalJwtAuthGuard)
+  async getMangaById(@Request() req: any, @Param('id') id: string, @Query() query?: any) {
+    const userId = await req?.user?.userId;
 
-    const result = await this.mangaService.getManagaById(id, userId);
+    const result = await this.mangaService.getManagaById(id, userId, query);
     return result;
   }
 

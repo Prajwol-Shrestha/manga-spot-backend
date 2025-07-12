@@ -57,13 +57,16 @@ export class MangaService {
     }
   }
 
-  async getManagaById(id: string, userId?: string) {
+  async getManagaById(id: string, userId?: string, query?: any) {
     try {
       const bookmarks = await this.bookmarkService.getAllBookmarks(
         userId || '',
       );
       const mangaDetailsPromise = this.httpService.get<MangaEntityResponse>(
         ENDPOINTS.getMangaById.replace(':id', id),
+        {
+          params: query
+        }
       );
       const managaChaptersPromise = this.httpService.get<MangaVolumesResponse>(
         ENDPOINTS.getMangaAggregate.replace(':id', id),
@@ -101,7 +104,7 @@ export class MangaService {
       const mangaData = await this.httpService.get<MangaEntityResponse>(
         ENDPOINTS.getRandomManga,
         {
-          params: queryParams,
+          params: query,
         },
       );
       const transformedData = mapManga(mangaData?.data);
@@ -109,6 +112,7 @@ export class MangaService {
         ENDPOINTS.getMangaAggregate.replace(':id', transformedData.id),
       );
       const transformedVolumeData = mapVolumeAndChapters(volumeDetails);
+      console.log(transformedVolumeData, 'volumeDetails')
 
       const finalResponse = {
         ...transformedData,
