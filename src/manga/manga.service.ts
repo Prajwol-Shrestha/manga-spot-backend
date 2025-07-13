@@ -42,7 +42,7 @@ export class MangaService {
         return transformedData;
       });
       const bookmarkedFieldAddedData = modifiedData.map((manga) => {
-        const hasBookMarked = bookmarks.some(
+        const hasBookMarked = bookmarks.data.some(
           (bookmark) => bookmark.mangaId === manga.id,
         );
         return {
@@ -82,7 +82,7 @@ export class MangaService {
         ...transformedMangaData,
         volumes: transformedVolumeData,
       };
-      const hasBookMarked = bookmarks.some(
+      const hasBookMarked = bookmarks.data.some(
         (bookmark) => bookmark.mangaId === finalResponse.id,
       );
       return {
@@ -118,7 +118,7 @@ export class MangaService {
         ...transformedData,
         volumes: transformedVolumeData,
       };
-      const hasBookMarked = bookmarks.some(
+      const hasBookMarked = bookmarks.data.some(
         (bookmark) => bookmark.mangaId === finalResponse.id,
       );
       return {

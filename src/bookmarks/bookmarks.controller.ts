@@ -6,11 +6,13 @@ import {
   NotImplementedException,
   Param,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/passport-jwt.guard';
 import { BookmarksService } from './bookmarks.service';
+import { PaginationDto } from 'src/shared/dtos/pagination.dto';
 
 @Controller('bookmarks')
 export class BookmarksController {
@@ -18,9 +20,10 @@ export class BookmarksController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  async getAllBookmarks(@Request() req) {
+  async getAllBookmarks(@Request() req, @Query() pagination?: PaginationDto) {
+    console.log(pagination, 'pagination')
     const userId = req.user.userId;
-    const result = await this.bookmarkService.getAllBookmarks(userId);
+    const result = await this.bookmarkService.getAllBookmarks(userId, pagination);
     return result;
   }
 
