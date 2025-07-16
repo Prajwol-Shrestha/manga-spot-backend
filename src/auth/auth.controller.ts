@@ -14,6 +14,7 @@ import { AuthService } from './auth.service';
 import { PassportLocalGuard } from './guards/passport-local.guard';
 import { SignupDto } from './dtos/signup.dto';
 import { Response } from 'express';
+import { JwtAuthGuard } from './guards/passport-jwt.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -22,16 +23,18 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   @UseGuards(PassportLocalGuard)
-  async login(@Request() request, @Res({passthrough: true}) res: Response) {
-    const { accessToken, ...user } = await this.authService.signIn(request.user);
-    
-    res.cookie('access_token', accessToken, {
+  async login(@Request() request, @Res({ passthrough: true }) res: Response) {
+    const user = await this.authService.signIn(
+      request.user,
+    );
+
+    res.cookie('accessToken', user.accessToken, {
       httpOnly: true,
       secure: false,
       sameSite: 'lax',
       path: '/',
-      maxAge: 1000 * 60 * 60 * 24 * 7
-    })
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    });
     return user;
   }
 
@@ -43,9 +46,10 @@ export class AuthController {
   }
 
   @Get('logout')
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   async logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie('access_token', {path: '/'});
-    return {message: 'Logged out'}
+    res.clearCookie('accessToken', { path: '/' });
+    return { message: 'Logged out' };
   }
 }

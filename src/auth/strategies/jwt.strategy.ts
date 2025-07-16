@@ -9,12 +9,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (req: Request) => {
-          return req.cookies['access_token'];
-        }
+        (req: Request) => req.cookies['accessToken'],
+        ExtractJwt.fromAuthHeaderAsBearerToken(),
       ]),
       ignoreExpiration: false,
-        secretOrKey: JWT_SECRET,
+      secretOrKey: JWT_SECRET,
     });
   }
 

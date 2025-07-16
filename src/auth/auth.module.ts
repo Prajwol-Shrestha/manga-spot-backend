@@ -18,7 +18,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     JwtModule.register({
       global: true,
       secret: JWT_SECRET,
-      signOptions: { expiresIn: '1d' },
+      signOptions: { expiresIn: '2d' },
     }),
     PrismaModule
   ],
