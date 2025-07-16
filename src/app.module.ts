@@ -9,6 +9,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { MangaModule } from './manga/manga.module';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
 import { ChapterPagesModule } from './chapter-pages/chapter-pages.module';
+import { TagsModule } from './tags/tags.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { ChapterPagesModule } from './chapter-pages/chapter-pages.module';
     MangaModule,
     BookmarksModule,
     ChapterPagesModule,
+    TagsModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
