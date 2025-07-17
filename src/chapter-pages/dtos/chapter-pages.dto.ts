@@ -1,3 +1,4 @@
+import { MangaData } from "src/types/manga";
 
 export class ChapterPagesDto {
     result: string;
@@ -12,5 +13,8 @@ export class ChapterPagesDto {
 export class ChapterPagesOutputDto{
     result: string;
     count: number;
-    images: string[]
+    data: {
+        chapterImages: string[],
+        mangaDetails: MangaData
+    }
 }

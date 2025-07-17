@@ -20,5 +20,6 @@ import { BookmarksModule } from 'src/bookmarks/bookmarks.module';
   ],
   controllers: [MangaController],
   providers: [MangaService],
+  exports: [MangaService]
 })
 export class MangaModule {}

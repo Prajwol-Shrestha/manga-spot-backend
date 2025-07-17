@@ -57,7 +57,7 @@ export class MangaService {
     }
   }
 
-  async getManagaById(id: string, userId?: string, query?: any) {
+  async getMangaById(id: string, userId?: string, query?: any) {
     try {
       const bookmarks = await this.bookmarkService.getAllBookmarks(
         userId || '',

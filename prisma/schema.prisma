@@ -25,6 +25,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   bookmarks Bookmark[]
+  readingHistory ReadingHistory[]
 }
 
 
@@ -37,4 +38,16 @@ model Bookmark {
   createdAt DateTime @default(now())
 
   @@id([userId, mangaId]) // Composite primary key
+}
+
+model ReadingHistory{
+  userId  String
+  user User @relation(fields: [userId], references: [id])
+  mangaId String @id @unique
+  title String
+  coverArt String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  chapterNumber  String
+  chapterId String
 }

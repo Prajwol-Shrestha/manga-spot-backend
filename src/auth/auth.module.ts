@@ -7,7 +7,7 @@ import { JWT_SECRET } from 'src/configs/configs';
 import { UserModule } from 'src/user/user.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { PrismaModule } from 'src/prisma/prisma.module';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   controllers: [AuthController],

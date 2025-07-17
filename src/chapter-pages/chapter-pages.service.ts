@@ -5,23 +5,62 @@ import {
   ChapterPagesDto,
   ChapterPagesOutputDto,
 } from './dtos/chapter-pages.dto';
+import { MangaService } from 'src/manga/manga.service';
+import { MangaEntityResponse } from 'src/types/manga';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ChapterPagesService {
-  constructor(private httpService: AxiosHttpService) {}
+  constructor(
+    private httpService: AxiosHttpService,
+    private mangaService: MangaService,
+    private prismaService: PrismaService,
+  ) {}
 
-  async getChapterPages(chapterId: string): Promise<ChapterPagesOutputDto> {
-    const data = await this.httpService.get<ChapterPagesDto>(
+  async getChapterPages(chapterId: string, mangaId: string): Promise<any> {
+    const chaptersPromise = this.httpService.get<ChapterPagesDto>(
       ENDPOINTS.getChapterPages.replace(':chapterId', chapterId),
     );
-    const baseUrl = data?.baseUrl;
-    const images = data?.chapter?.data?.map(
-      (image) => `${baseUrl}/data/${data.chapter.hash}/${image}`,
+    const mangaDataPromise = this.mangaService.getMangaById(mangaId);
+    const [chapterData, mangaData] = await Promise.all([
+      chaptersPromise,
+      mangaDataPromise,
+    ]);
+    const baseUrl = chapterData?.baseUrl;
+    const images = chapterData?.chapter?.data?.map(
+      (image) => `${baseUrl}/data/${chapterData.chapter.hash}/${image}`,
     );
-    return {
-      result: data.result,
+
+    const finalPayload = {
+      result: chapterData.result,
       count: images.length || 0,
-      images,
+      data: {
+        chapterImages: images,
+        mangaDetails: mangaData,
+      },
     };
+
+    return finalPayload;
+  }
+
+  async trackReadingHistory(event: any) {
+    console.log(event, 'event')
+    const alreadyInReading = await this.prismaService.readingHistory.findFirst({
+      where: {
+        userId: event.userId,
+        mangaId: event.mangaId,
+      },
+    });
+    if (alreadyInReading) {
+      return this.prismaService.readingHistory.update({
+        where: {
+          mangaId: alreadyInReading.mangaId,
+        },
+        data: event,
+      });
+    }
+    return this.prismaService.readingHistory.create({
+      data: event,
+    });
   }
 }
