@@ -14,40 +14,38 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
 model User {
-  id    String     @default(cuid()) @id @unique
-  username String @unique
-  email String  @unique
-  password String
-  name  String
+  id        String   @id @unique @default(cuid())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  bookmarks Bookmark[]
+  bookmarks      Bookmark[]
   readingHistory ReadingHistory[]
 }
 
-
 model Bookmark {
-  user     User   @relation(fields: [userId], references: [id])
-  userId   String
-  mangaId  String
-  title    String
-  coverArt String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  mangaId   String
+  title     String
+  coverArt  String
   createdAt DateTime @default(now())
 
   @@id([userId, mangaId]) // Composite primary key
 }
 
-model ReadingHistory{
-  userId  String
-  user User @relation(fields: [userId], references: [id])
-  mangaId String @id @unique
-  title String
-  coverArt String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  chapterNumber  String
-  chapterId String
+model ReadingHistory {
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mangaId       String   @id @unique
+  title         String
+  coverArt      String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  chapterNumber String
+  chapterId     String
 }
