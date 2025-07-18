@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { PaginationDto } from 'src/shared/dtos/pagination.dto';
+import { CreateBookMarkDto } from './dtos/create-bookmark.dto';
+import { BookmarkDto, BookmarkOutputDto } from './dtos/bookmark-output.dto';
 
 @Injectable()
 export class BookmarksService {
   constructor(private prismaService: PrismaService) {}
 
-  async getAllBookmarks(userId: string, pagination?: PaginationDto) {
-    console.log(pagination, 'pagination')
+  async getAllBookmarks(userId: string, pagination?: PaginationDto): Promise<BookmarkOutputDto> {
     const limit = pagination?.limit ?? 10;
     const offset = pagination?.offset ?? 0;
     const result = await this.prismaService.bookmark.findMany({
@@ -35,8 +36,8 @@ export class BookmarksService {
 
   async createBookmark(
     userId: string,
-    data: { mangaId: string; title: string; coverArt: string },
-  ) {
+    data: CreateBookMarkDto,
+  ): Promise<BookmarkDto> {
     const result = await this.prismaService.bookmark.create({
       data: {
         userId: userId,
@@ -49,7 +50,7 @@ export class BookmarksService {
     return result;
   }
 
-  async deleteBookmark(userId: string, mangaId: string) {
+  async deleteBookmark(userId: string, mangaId: string): Promise<BookmarkDto>  {
     const result = await this.prismaService.bookmark.delete({
       where: {
         userId_mangaId: {
