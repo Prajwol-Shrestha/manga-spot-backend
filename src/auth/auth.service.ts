@@ -10,8 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { SignupDto } from './dtos/signup.dto';
 import { LoginDto } from './dtos/login.dto';
 import { ISafeUser } from 'src/types/user';
-
-type AuthResult = { accessToken: string } & ISafeUser;
+import { SafeUserOutputDto, UserOutputDto } from 'src/user/dtos/user-output.dto';
 
 @Injectable()
 export class AuthService {
@@ -21,7 +20,7 @@ export class AuthService {
     private prismaService: PrismaService,
   ) {}
 
-  async authenticate(input: LoginDto): Promise<AuthResult> {
+  async authenticate(input: LoginDto): Promise<SafeUserOutputDto> {
     const user = await this.validateUser(input);
 
     if (!user) {
@@ -31,12 +30,12 @@ export class AuthService {
     return this.signIn(user);
   }
 
-  async validateUser(input: LoginDto): Promise<ISafeUser | null> {
+  async validateUser(input: LoginDto): Promise<SafeUserOutputDto | null> {
     const user = await this.userService.findUserByName(input.username);
     if (user) {
       const isSamePassword = await bcrypt.compare(
         input.password,
-        user.password,
+        user.password!,
       );
       const { password, ...safeUser } = user;
       if (isSamePassword) {
@@ -46,7 +45,7 @@ export class AuthService {
     return null;
   }
 
-  async signIn(user: ISafeUser): Promise<AuthResult> {
+  async signIn(user: SafeUserOutputDto): Promise<SafeUserOutputDto> {
     const tokenPayload = {
       sub: user.id,
       username: user.username,

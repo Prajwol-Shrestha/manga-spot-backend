@@ -2,12 +2,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ISafeUser, IUser } from 'src/types/user';
 import { UpdateUserDto } from './dtos/update-user.dto';
+import { SafeUserOutputDto, UserOutputDto } from './dtos/user-output.dto';
 
 @Injectable()
 export class UserService {
   constructor(private PrismaService: PrismaService) {}
 
-  async findUserByName(username: string): Promise<IUser | undefined> {
+  async findUserByName(username: string): Promise<UserOutputDto | undefined> {
     const user = await this.PrismaService.user.findUnique({
       where: {
         username: username,
@@ -34,7 +35,7 @@ export class UserService {
     return user;
   }
 
-  async deleteUser(username: string): Promise<any | undefined> {
+  async deleteUser(username: string): Promise<SafeUserOutputDto | undefined> {
     const user = await this.findUserByName(username);
 
     if (!user) {

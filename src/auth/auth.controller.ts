@@ -4,9 +4,8 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  NotImplementedException,
   Post,
-  Request,
+  Req,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -15,18 +14,29 @@ import { PassportLocalGuard } from './guards/passport-local.guard';
 import { SignupDto } from './dtos/signup.dto';
 import { Response } from 'express';
 import { JwtAuthGuard } from './guards/passport-jwt.guard';
+import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
+import {
+  SafeUserOutputDto,
+} from 'src/user/dtos/user-output.dto';
+import { AuthenticatedRequest } from 'src/types/shared';
 
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Login user',
+    type: SafeUserOutputDto,
+    isArray: false,
+  })
   @Post('login')
   @UseGuards(PassportLocalGuard)
-  async login(@Request() request, @Res({ passthrough: true }) res: Response) {
-    const user = await this.authService.signIn(
-      request.user,
-    );
+  async login(
+    @Req() request: AuthenticatedRequest,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const user = await this.authService.signIn(request.user);
 
     res.cookie('accessToken', user.accessToken, {
       httpOnly: true,
@@ -38,16 +48,25 @@ export class AuthController {
     return user;
   }
 
-  @HttpCode(HttpStatus.CREATED)
   @Post('signup')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiCreatedResponse({
+    description: 'Signup user',
+    type: SafeUserOutputDto,
+    isArray: false,
+  })
   async signup(@Body() signUpData: SignupDto) {
     const user = await this.authService.signUp(signUpData);
     return user;
   }
 
-  @Get('logout')
-  @UseGuards(JwtAuthGuard)
+  @Post('logout')
   @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Logout user',
+    isArray: false,
+  })
+  @UseGuards(JwtAuthGuard)
   async logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('accessToken', { path: '/' });
     return { message: 'Logged out' };
