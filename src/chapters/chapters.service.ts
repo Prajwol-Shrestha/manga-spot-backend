@@ -10,7 +10,8 @@ import {
   LatestUpdatedChaptersResponseDto,
 } from './dtos/chapter-output.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ChapterPagesDto } from './dtos/chapter-pages.dto';
+import { ChapterPagesDto, ChapterPagesOutputDto } from './dtos/chapter-pages.dto';
+import { IReadingHistoryEvent } from './chapters.controller';
 
 @Injectable()
 export class ChaptersService {
@@ -72,7 +73,7 @@ export class ChaptersService {
     }
   }
 
-  async getChapterPages(chapterId: string, mangaId: string): Promise<any> {
+  async getChapterPages(chapterId: string, mangaId: string): Promise<ChapterPagesOutputDto> {
     const chaptersPromise = this.httpService.get<ChapterPagesDto>(
       ENDPOINTS.getChapterPages.replace(':chapterId', chapterId),
     );
@@ -100,8 +101,7 @@ export class ChaptersService {
     return finalPayload;
   }
 
-  async trackReadingHistory(event: any) {
-    console.log(event, 'event');
+  async trackReadingHistory(event: IReadingHistoryEvent) {
     const alreadyInReading = await this.prismaService.readingHistory.findFirst({
       where: {
         userId: event.userId,

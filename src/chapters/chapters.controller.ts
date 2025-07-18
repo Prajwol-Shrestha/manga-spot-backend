@@ -16,6 +16,15 @@ import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { ApiOkResponse } from '@nestjs/swagger';
 import { ChapterPagesOutputDto } from './dtos/chapter-pages.dto';
 
+export  interface IReadingHistoryEvent {
+  userId: string;
+  mangaId: string;
+  chapterId: string;
+  chapterNumber: string;
+  title: string;
+  coverArt: string;
+}
+
 @Controller('chapters')
 export class ChaptersController {
   constructor(
@@ -57,13 +66,13 @@ export class ChaptersController {
     const chapters = mangaData.volumes.flatMap((v) => v.chapters);
     const currentChapter = chapters.find((ch) => ch.chapterId === chapterId);
 
-    const event = {
+    const event: IReadingHistoryEvent = {
       userId,
       mangaId,
       chapterId,
-      chapterNumber: currentChapter?.chapter,
-      title: mangaData?.title,
-      coverArt: mangaData?.coverArt,
+      chapterNumber: currentChapter?.chapter || '0',
+      title: mangaData.title,
+      coverArt: mangaData.coverArt,
     };
     if (userId) {
       this.eventEmitter.emit('reading.history', event);
@@ -72,7 +81,7 @@ export class ChaptersController {
   }
 
   @OnEvent('reading.history')
-  async handleReadingHistoryEvent(event: any) {
-    return this.chapterService.trackReadingHistory(event);
+  async handleReadingHistoryEvent(event: IReadingHistoryEvent) {
+    await this.chapterService.trackReadingHistory(event);
   }
 }
