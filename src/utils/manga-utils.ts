@@ -2,7 +2,7 @@ import { IChapterData } from 'src/types/chapter';
 import { MangaData } from 'src/types/manga';
 import { MangaVolumesResponse } from 'src/types/volume';
 import { transformTags } from './tag-utils';
-import { ChapterDataOutputDto } from 'src/manga/dtos/chapter-output.dto';
+import { LatestUpdatedChapterDto } from 'src/chapters/dtos/chapter-output.dto';
 
 export const getEnglishOrFirstProperty = (obj: Record<string, any>): string => {
   return obj['en'] || obj[Object.keys(obj)[0]] || '';
@@ -108,7 +108,7 @@ export function transformChaptersData(chapters: IChapterData[]) {
     const {translatedLanguage, externalUrl, isUnavailable, version, ...rest } =
     attributes ?? {};
     
-    const payload: ChapterDataOutputDto = {
+    const payload: LatestUpdatedChapterDto = {
       ...rest,
       id: chapterId,
       mangaId: ''
@@ -117,21 +117,6 @@ export function transformChaptersData(chapters: IChapterData[]) {
     relationships?.forEach((relation) => {
       if (relation.type === 'manga') {
         payload.mangaId = relation?.id;
-        // const mangaAttributes = relation?.attributes;
-        // const manga = {
-        //   id: relation.id,
-        //   title: getEnglishOrFirstProperty(mangaAttributes.title),
-        //   description: getEnglishOrFirstProperty(mangaAttributes.description),
-        //   lastVolume: mangaAttributes.lastVolume,
-        //   lastChapter: mangaAttributes.lastChapter,
-        //   tags: transformTags(mangaAttributes.tags),
-        //   year: mangaAttributes.year,
-        //   status: mangaAttributes.status,
-        //   contentRating: mangaAttributes.contentRating,
-        //   createdAt: mangaAttributes.createdAt,
-        //   updatedAt: mangaAttributes.updatedAt,
-        // };
-        // payload.manga = manga;
       }
       if(relation.type === 'scanlation_group' && relation?.attributes) {
         payload.scanlator = relation?.attributes.name;

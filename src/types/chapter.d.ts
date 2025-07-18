@@ -18,7 +18,7 @@ export interface IChapterData {
 
 // Chapter Attributes
 export interface IChapterAttributes {
-  volume: string | null;
+  volume: string;
   chapter: string;
   title: string;
   translatedLanguage: string;

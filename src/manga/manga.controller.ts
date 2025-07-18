@@ -10,6 +10,8 @@ import { MangaService } from './manga.service';
 import { GetMangaQueryDto } from './dtos/get-manga-query.dto';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { OptionalJwtAuthGuard } from 'src/auth/guards/optional-jwt.guard';
+import { AuthenticatedRequestJWT } from 'src/types/shared';
+import { MangaItemWithVolumesDto, MangaOutputDto } from './dtos/manga-output.dto';
 
 @UseGuards(ThrottlerGuard)
 @Controller('manga')
@@ -18,8 +20,8 @@ export class MangaController {
 
   @Get()
   @UseGuards(OptionalJwtAuthGuard)
-  async getAllManga(@Request() req: any, @Query() query?: any) {
-    const userId = await req?.user?.userId;
+  async getAllManga(@Request() req: AuthenticatedRequestJWT, @Query() query?: any): Promise<MangaOutputDto> {
+    const userId = req?.user?.userId;
     const result = await this.mangaService.getManga(query, userId);
     return result;
   }
@@ -27,41 +29,17 @@ export class MangaController {
   // TODO: DTO is rejecting query like includes[]=cover_art&includes[]=author
   @Get('random')
   @UseGuards(OptionalJwtAuthGuard)
-  async getRandomManga(@Request() req: any, @Query() query?: any) {
-    const userId = await req?.user?.userId;
-
+  async getRandomManga(@Request() req: AuthenticatedRequestJWT, @Query() query?: any): Promise<MangaItemWithVolumesDto> {
+    const userId = req?.user?.userId;
     const result = await this.mangaService.getRandomManga(query, userId);
     return result;
-  }
-
-  @Get('latest-updated-chapters')
-  async getChapters(@Query() query: any) {
-    const result = await this.mangaService.getChapters(query);
-    return result;
-  }
-
-  @Get('tags')
-  async getTags() {
-    const result = await this.mangaService.getAllTags();
-    return result;
-  }
+}
 
   @Get(':id')
   @UseGuards(OptionalJwtAuthGuard)
-  async getMangaById(@Request() req: any, @Param('id') id: string, @Query() query?: any) {
-    const userId = await req?.user?.userId;
-
+  async getMangaById(@Request() req: AuthenticatedRequestJWT, @Param('id') id: string, @Query() query?: any): Promise<MangaItemWithVolumesDto> {
+    const userId =  req?.user?.userId;
     const result = await this.mangaService.getMangaById(id, userId, query);
     return result;
   }
-
-  //   @Get(':id')
-  //   getMangaChapters() {
-  //     return 'Manga Chapters';
-  //   }
-
-  //   @Get(':id')
-  //   getMangaFeed() {
-  //     return 'Manga manga feed';
-  //   }
 }

@@ -15,10 +15,7 @@ import { SignupDto } from './dtos/signup.dto';
 import { Response } from 'express';
 import { JwtAuthGuard } from './guards/passport-jwt.guard';
 import { ApiCreatedResponse, ApiOkResponse } from '@nestjs/swagger';
-import {
-  SafeUserOutputDto,
-} from 'src/user/dtos/user-output.dto';
-import { AuthenticatedRequest } from 'src/types/shared';
+import { SafeUserOutputDto } from 'src/user/dtos/user-output.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -33,7 +30,7 @@ export class AuthController {
   @Post('login')
   @UseGuards(PassportLocalGuard)
   async login(
-    @Req() request: AuthenticatedRequest,
+    @Req() request: Request & { user: SafeUserOutputDto },
     @Res({ passthrough: true }) res: Response,
   ) {
     const user = await this.authService.signIn(request.user);

@@ -8,10 +8,10 @@ import { PrismaService } from './prisma/prisma.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { MangaModule } from './manga/manga.module';
 import { BookmarksModule } from './bookmarks/bookmarks.module';
-import { ChapterPagesModule } from './chapter-pages/chapter-pages.module';
 import { TagsModule } from './tags/tags.module';
 import { ReadingHistoryModule } from './reading-history/reading-history.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ChaptersModule } from './chapters/chapters.module';
 
 @Module({
   imports: [
@@ -22,9 +22,9 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
     PrismaModule,
     MangaModule,
     BookmarksModule,
-    ChapterPagesModule,
     TagsModule,
     ReadingHistoryModule,
+    ChaptersModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],
