@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { dummyMangaDetails } from 'src/constants/static-list';
 import { MangaItemWithVolumesDto } from 'src/manga/dtos/manga-output.dto';
 
 export class ChapterPagesDto {
