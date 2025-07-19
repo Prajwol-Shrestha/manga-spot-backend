@@ -67,4 +67,6 @@ export class UserOutputDto {
   updatedAt: Date;
 }
 
-export class SafeUserOutputDto extends OmitType(UserOutputDto, ['password'] as const) {}
+export class SafeUserOutputDto extends OmitType(UserOutputDto, [
+  'password',
+] as const) {}

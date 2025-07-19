@@ -8,7 +8,7 @@ import { SafeUserOutputDto, UserOutputDto } from './dtos/user-output.dto';
 export class UserService {
   constructor(private PrismaService: PrismaService) {}
 
-  async findUserByName(username: string): Promise<UserOutputDto | undefined> {
+  async findUserByName(username: string): Promise<UserOutputDto> {
     const user = await this.PrismaService.user.findUnique({
       where: {
         username: username,
@@ -23,8 +23,16 @@ export class UserService {
   async updateUser(
     userId: string,
     input: UpdateUserDto,
-  ): Promise<ISafeUser | undefined> {
+  ): Promise<UserOutputDto> {
     const { username, ...safeUpdateUser } = input;
+
+    const foundUser = await this.PrismaService.user.findUnique({
+      where: { id: userId },
+    });
+    if (!foundUser) {
+      throw new NotFoundException('User not found');
+    }
+
     const user = await this.PrismaService.user.update({
       where: {
         id: userId,
@@ -35,7 +43,7 @@ export class UserService {
     return user;
   }
 
-  async deleteUser(username: string): Promise<SafeUserOutputDto | undefined> {
+  async deleteUser(username: string): Promise<SafeUserOutputDto> {
     const user = await this.findUserByName(username);
 
     if (!user) {
