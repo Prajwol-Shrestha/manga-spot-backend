@@ -24,12 +24,10 @@ export class MangaService {
       const bookmarks = await this.bookmarkService.getAllBookmarks(
         userId || '',
       );
-      const param = buildMangaDexQueryParams(query)
-      console.log(param, 'param')
       const result = await this.httpService.get<MangaCollectionResponse>(
         ENDPOINTS.getAllMangas,
         {
-          params: param,
+          params: query,
         },
       );
 

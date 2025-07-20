@@ -8,7 +8,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { MangaService } from './manga.service';
-import { GetMangaQueryDto } from './dtos/get-manga-query.dto';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { OptionalJwtAuthGuard } from 'src/auth/guards/optional-jwt.guard';
 import { AuthenticatedRequestJWT } from 'src/types/shared';
