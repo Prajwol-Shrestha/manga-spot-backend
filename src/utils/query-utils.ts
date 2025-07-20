@@ -1,33 +1,19 @@
-export function buildQueryParams(
-  input: Record<string, any>,
-): Record<string, any> {
-  const params: Record<string, any> = {};
+export function buildMangaDexQueryParams(query: Record<string, any>) {
+  const params = new URLSearchParams();
 
-  for (const key in input) {
-    const value = input[key];
+  for (const key in query) {
+    const value = query[key];
 
-    if (value === undefined || value === null) continue;
-
-    // Handle arrays (e.g. status[])
     if (Array.isArray(value)) {
       value.forEach((v) => {
-        if (!params[`${key}[]`]) {
-          params[`${key}[]`] = [];
-        }
-        params[`${key}[]`].push(v);
+        params.append(`${key}[]`, v); // 👈 convert back to includes[]
       });
-    }
-
-    // Handle nested objects (e.g. order[title]=asc)
-    else if (typeof value === 'object' && !Array.isArray(value)) {
-      for (const nestedKey in value) {
-        params[`${key}[${nestedKey}]`] = value[nestedKey];
+    } else if (typeof value === 'object' && value !== null) {
+      for (const subKey in value) {
+        params.append(`${key}[${subKey}]`, value[subKey]);
       }
-    }
-
-    // Handle primitive values
-    else {
-      params[key] = value;
+    } else if (value !== undefined) {
+      params.append(key, value);
     }
   }
 

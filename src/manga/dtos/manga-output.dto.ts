@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { TagOutputDto } from './tag-output.dto';
 import { BaseListMetaOutputDto } from 'src/shared/dtos/base-list-meta-output.dto';
+import { TagDto } from 'src/tags/dtos/tag-output.dto';
 
 export enum MangaStatus {
   ONGOING = 'Ongoing',
@@ -95,10 +95,10 @@ export class MangaItemDto {
   contentRating: ContentRating;
 
   @ApiProperty({
-    type: [TagOutputDto],
+    type: [TagDto],
     description: 'Tags related to the manga',
   })
-  tags: TagOutputDto[];
+  tags: TagDto[];
 
   @ApiProperty({
     description: 'Name of the author',

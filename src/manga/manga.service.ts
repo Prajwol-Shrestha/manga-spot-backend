@@ -9,6 +9,8 @@ import {
 import { MangaCollectionResponse, MangaEntityResponse } from 'src/types/manga';
 import { MangaVolumesResponse } from 'src/types/volume';
 import { BookmarksService } from 'src/bookmarks/bookmarks.service';
+import { buildMangaDexQueryParams } from 'src/utils/query-utils';
+// import { buildQueryParams } from 'src/utils/query-utils';
 
 @Injectable()
 export class MangaService {
@@ -22,10 +24,12 @@ export class MangaService {
       const bookmarks = await this.bookmarkService.getAllBookmarks(
         userId || '',
       );
+      const param = buildMangaDexQueryParams(query)
+      console.log(param, 'param')
       const result = await this.httpService.get<MangaCollectionResponse>(
         ENDPOINTS.getAllMangas,
         {
-          params: query,
+          params: param,
         },
       );
 
