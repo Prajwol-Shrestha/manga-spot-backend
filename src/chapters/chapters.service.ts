@@ -74,31 +74,36 @@ export class ChaptersService {
   }
 
   async getChapterPages(chapterId: string, mangaId: string): Promise<ChapterPagesOutputDto> {
-    const chaptersPromise = this.httpService.get<ChapterPagesDto>(
-      ENDPOINTS.getChapterPages.replace(':chapterId', chapterId),
-    );
-    const mangaDataPromise = this.mangaService.getMangaById(mangaId);
-
-    const [chapterData, mangaData] = await Promise.all([
-      chaptersPromise,
-      mangaDataPromise,
-    ]);
-
-    const baseUrl = chapterData?.baseUrl;
-    const images = chapterData?.chapter?.data?.map(
-      (image) => `${baseUrl}/data/${chapterData.chapter.hash}/${image}`,
-    );
-
-    const finalPayload = {
-      result: chapterData.result,
-      count: images.length || 0,
-      data: {
-        chapterImages: images,
-        mangaDetails: mangaData,
-      },
-    };
-
-    return finalPayload;
+    try {
+      const chaptersPromise = this.httpService.get<ChapterPagesDto>(
+        ENDPOINTS.getChapterPages.replace(':chapterId', chapterId),
+      );
+      const mangaDataPromise = this.mangaService.getMangaById(mangaId);
+  
+      const [chapterData, mangaData] = await Promise.all([
+        chaptersPromise,
+        mangaDataPromise,
+      ]);
+  
+      const baseUrl = chapterData?.baseUrl;
+      const images = chapterData?.chapter?.data?.map(
+        (image) => `${baseUrl}/data/${chapterData.chapter.hash}/${image}`,
+      );
+  
+      const finalPayload = {
+        result: chapterData.result,
+        count: images.length || 0,
+        data: {
+          chapterImages: images,
+          mangaDetails: mangaData,
+        },
+      };
+  
+      return finalPayload;
+    } catch (error) {
+      console.log('error', error);
+      throw error;
+    }
   }
 
   async trackReadingHistory(event: IReadingHistoryEvent) {

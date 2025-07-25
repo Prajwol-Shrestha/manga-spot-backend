@@ -63,7 +63,6 @@ export class AuthController {
     description: 'Logout user',
     isArray: false,
   })
-  @UseGuards(JwtAuthGuard)
   async logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('accessToken', { path: '/' });
     return { message: 'Logged out' };
