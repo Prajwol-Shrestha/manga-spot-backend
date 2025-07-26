@@ -35,13 +35,13 @@ export class AuthController {
   ) {
     const user = await this.authService.signIn(request.user);
 
-    res.cookie('accessToken', user.accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'none',
-      path: '/',
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-    });
+    // res.cookie('accessToken', user.accessToken, {
+    //   httpOnly: true,
+    //   secure: true,
+    //   sameSite: 'none',
+    //   path: '/',
+    //   maxAge: 1000 * 60 * 60 * 24 * 7,
+    // });
     return user;
   }
 
@@ -64,7 +64,7 @@ export class AuthController {
     isArray: false,
   })
   async logout(@Res({ passthrough: true }) res: Response) {
-    res.clearCookie('accessToken', { path: '/' });
+    // res.clearCookie('accessToken', { path: '/' });
     return { message: 'Logged out' };
   }
 }
