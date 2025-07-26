@@ -13,7 +13,7 @@ async function bootstrap() {
     }),
   );
   app.enableCors({
-    origin: ['http://localhost:3000', 'https://manga-spot.prajwolshrestha08.workers.dev/'],
+    origin: ['http://localhost:3000', 'https://manga-spot.prajwolshrestha08.workers.dev'],
     credentials: true,
   });
   app.use(cookieParser());
