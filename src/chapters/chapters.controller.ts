@@ -56,20 +56,19 @@ export class ChaptersController {
   @UseGuards(OptionalJwtAuthGuard)
   async getChapterPages(
     @Req() req: AuthenticatedRequestJWT,
-    @Param('id') params: { id: string },
+    @Param('id') id: string,
     @Query('mangaId') mangaId: string,
   ): Promise<ChapterPagesOutputDto> {
     const userId = req?.user?.userId;
-    const { id: chapterId } = params;
-    const data = await this.chapterService.getChapterPages(chapterId, mangaId);
+    const data = await this.chapterService.getChapterPages(id, mangaId);
     const mangaData = data?.data?.mangaDetails;
     const chapters = mangaData.volumes.flatMap((v) => v.chapters);
-    const currentChapter = chapters.find((ch) => ch.chapterId === chapterId);
+    const currentChapter = chapters.find((ch) => ch.chapterId === id);
 
     const event: IReadingHistoryEvent = {
       userId,
       mangaId,
-      chapterId,
+      chapterId: id,
       chapterNumber: currentChapter?.chapter || '0',
       title: mangaData.title,
       coverArt: mangaData.coverArt,
