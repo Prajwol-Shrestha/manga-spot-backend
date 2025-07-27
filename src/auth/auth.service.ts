@@ -9,8 +9,8 @@ import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { SignupDto } from './dtos/signup.dto';
 import { LoginDto } from './dtos/login.dto';
-import { ISafeUser } from 'src/types/user';
-import { SafeUserOutputDto, UserOutputDto } from 'src/user/dtos/user-output.dto';
+import { BaseUserDto } from 'src/user/dtos/user-output.dto';
+import { LoginOutputDto } from './dtos/login-output.dto';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +20,7 @@ export class AuthService {
     private prismaService: PrismaService,
   ) {}
 
-  async authenticate(input: LoginDto): Promise<SafeUserOutputDto> {
+  async authenticate(input: LoginDto): Promise<BaseUserDto> {
     const user = await this.validateUser(input);
 
     if (!user) {
@@ -30,14 +30,16 @@ export class AuthService {
     return this.signIn(user);
   }
 
-  async validateUser(input: LoginDto): Promise<SafeUserOutputDto | null> {
+  async validateUser(input: LoginDto): Promise<BaseUserDto | null> {
     const user = await this.userService.findUserByName(input.username);
+    const unsafeUser = await this.userService.findUserById((user.id))
+
     if (user) {
       const isSamePassword = await bcrypt.compare(
         input.password,
-        user.password!,
+        unsafeUser.password!,
       );
-      const { password, ...safeUser } = user;
+      const { password, ...safeUser } = unsafeUser;
       if (isSamePassword) {
         return safeUser;
       }
@@ -45,7 +47,7 @@ export class AuthService {
     return null;
   }
 
-  async signIn(user: SafeUserOutputDto): Promise<SafeUserOutputDto> {
+  async signIn(user: BaseUserDto): Promise<LoginOutputDto> {
     const tokenPayload = {
       sub: user.id,
       username: user.username,
@@ -56,7 +58,7 @@ export class AuthService {
     return { accessToken, ...user };
   }
 
-  async signUp(user: SignupDto) {
+  async signUp(user: SignupDto): Promise<LoginOutputDto> {
     const { email, username, password: inputPassword, name } = user;
 
     const existingEmail = await this.prismaService.user.findUnique({

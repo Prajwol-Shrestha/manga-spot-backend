@@ -10,11 +10,11 @@ import {
 } from 'class-validator';
 
 export class SignupDto {
-  @ApiProperty({description: 'Name of the user', required: true})
+  @ApiProperty({description: 'Name of the user', required: true, example: 'John Doe'})
   @IsString()
   name: string;
 
-  @ApiProperty({description: 'Username of the user', required: true})
+  @ApiProperty({description: 'Username of the user', required: true, example: 'johndoe'})
   @IsString()
   @MinLength(6)
   @MaxLength(30)
@@ -24,11 +24,11 @@ export class SignupDto {
   })
   username: string;
 
-  @ApiProperty({description: 'Email of the user', required: true})
+  @ApiProperty({description: 'Email of the user', required: true, example: 'tWbB6@example.com'})
   @IsEmail()
   email: string;
 
-  @ApiProperty({description: 'Password of the user', required: true})
+  @ApiProperty({description: 'Password of the user', required: true, example: 'Password123'})
   @IsStrongPassword()
   password: string;
 }

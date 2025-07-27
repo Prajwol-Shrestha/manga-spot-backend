@@ -1,13 +1,7 @@
-import { ApiProperty, OmitType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
 
-export class UserOutputDto {
-  @ApiProperty({
-    description: 'Access token',
-  })
-  @IsOptional()
-  accessToken?: string;
-
+export class BaseUserDto {
   @ApiProperty({
     description: 'User ID',
     example: 'a1b2c3d4-e5f6-7890-abcd-1234567890ef',
@@ -37,14 +31,6 @@ export class UserOutputDto {
   email: string;
 
   @ApiProperty({
-    description: 'Password',
-    example: 'password',
-  })
-  @IsString()
-  @IsOptional()
-  password?: string;
-
-  @ApiProperty({
     description: 'Avatar',
     example: 'avatar',
   })
@@ -54,19 +40,24 @@ export class UserOutputDto {
 
   @ApiProperty({
     description: 'User Created At',
-    example: '2020-01-01T00:00:00Z',
+    example: '2022-01-01T00:00:00Z',
   })
   @IsString()
   createdAt: Date;
 
   @ApiProperty({
     description: 'User Updated At',
-    example: '2020-01-01T00:00:00Z',
+    example: '2022-01-01T00:00:00Z',
   })
   @IsString()
   updatedAt: Date;
 }
 
-export class SafeUserOutputDto extends OmitType(UserOutputDto, [
-  'password',
-] as const) {}
+export class UserWithPasswordDto extends BaseUserDto {
+  @ApiProperty({
+    description: 'Password',
+    example: 'password',
+  })
+  @IsString()
+  password: string;
+}
