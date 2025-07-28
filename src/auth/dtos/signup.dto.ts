@@ -7,6 +7,7 @@ import {
   Max,
   MaxLength,
   Matches,
+  IsOptional,
 } from 'class-validator';
 
 export class SignupDto {
@@ -31,4 +32,9 @@ export class SignupDto {
   @ApiProperty({description: 'Password of the user', required: true, example: 'Password123'})
   @IsStrongPassword()
   password: string;
+
+  @ApiProperty({description: 'Avatar URL of the user', required: false, example: 'https://example.com/avatar.jpg'})
+  @IsString()
+  @IsOptional()
+  avatarUrl: string;
 }

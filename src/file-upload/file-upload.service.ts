@@ -5,9 +5,8 @@ import { SupabaseService } from 'src/supabase/supabase.service';
 export class FileUploadService {
   constructor(private readonly supabaseService: SupabaseService) {}
 
-  async getSignedUrl(bucketName: string, fileName: string) {
-    const supabase = this.supabaseService.getClient();
-
+  async getSignedUrl(bucketName: string = 'avatars', fileName: string) {
+      const supabase = this.supabaseService.getClient();
     const { data, error } = await supabase.storage
       .from(bucketName)
       .createSignedUploadUrl(fileName, {
