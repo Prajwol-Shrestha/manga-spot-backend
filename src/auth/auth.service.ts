@@ -35,9 +35,10 @@ export class AuthService {
     const unsafeUser = await this.userService.findUserById((user.id))
 
     if (user) {
+      const crypeted = await bcrypt.hash(input.password, 10);
       const isSamePassword = await bcrypt.compare(
         input.password,
-        unsafeUser.password!,
+       crypeted,
       );
       const { password, ...safeUser } = unsafeUser;
       if (isSamePassword) {
