@@ -1,4 +1,3 @@
-// src/common/http/http.module.ts
 import { Module } from '@nestjs/common';
 import { AxiosHttpService } from './axios-http.service';
 

@@ -12,6 +12,10 @@ import { TagsModule } from './tags/tags.module';
 import { ReadingHistoryModule } from './reading-history/reading-history.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ChaptersModule } from './chapters/chapters.module';
+import { FileUploadModule } from './file-upload/file-upload.module';
+import { SupabaseModule } from './supabase/supabase.module';
+import { ImageController } from './image/image.controller';
+import { ImageModule } from './image/image.module';
 
 @Module({
   imports: [
@@ -25,8 +29,11 @@ import { ChaptersModule } from './chapters/chapters.module';
     TagsModule,
     ReadingHistoryModule,
     ChaptersModule,
+    FileUploadModule,
+    SupabaseModule,
+    ImageModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, ImageController],
   providers: [AppService, PrismaService],
 })
 export class AppModule {}

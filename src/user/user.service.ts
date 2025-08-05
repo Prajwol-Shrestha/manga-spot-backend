@@ -1,17 +1,32 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { ISafeUser, IUser } from 'src/types/user';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { SafeUserOutputDto, UserOutputDto } from './dtos/user-output.dto';
+import { BaseUserDto, UserWithPasswordDto } from './dtos/user-output.dto';
 
 @Injectable()
 export class UserService {
   constructor(private PrismaService: PrismaService) {}
 
-  async findUserByName(username: string): Promise<UserOutputDto> {
+  async findUserById(id: string): Promise<UserWithPasswordDto> {
+    const user = await this.PrismaService.user.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!user) {
+      throw new NotFoundException();
+    }
+
+    return user;
+  }
+
+  async findUserByName(username: string): Promise<BaseUserDto> {
     const user = await this.PrismaService.user.findUnique({
       where: {
         username: username,
+      },
+      omit: {
+        password: true,
       },
     });
     if (!user) {
@@ -23,15 +38,10 @@ export class UserService {
   async updateUser(
     userId: string,
     input: UpdateUserDto,
-  ): Promise<UserOutputDto> {
+  ): Promise<BaseUserDto> {
     const { username, ...safeUpdateUser } = input;
 
-    const foundUser = await this.PrismaService.user.findUnique({
-      where: { id: userId },
-    });
-    if (!foundUser) {
-      throw new NotFoundException('User not found');
-    }
+    await this.findUserById(userId);
 
     const user = await this.PrismaService.user.update({
       where: {
@@ -40,20 +50,16 @@ export class UserService {
       data: safeUpdateUser,
     });
 
-    return user;
+    const { password, ...safeUser } = user;
+
+    return safeUser;
   }
 
-  async deleteUser(username: string): Promise<SafeUserOutputDto> {
-    const user = await this.findUserByName(username);
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
+  async deleteUser(userId: string): Promise<BaseUserDto> {
+    const user = await this.findUserById(userId);
     const deletedUser = await this.PrismaService.user.delete({
-      where: { username },
+      where: { id: user.id },
     });
-
     const { password, ...safeUser } = deletedUser;
     return safeUser;
   }

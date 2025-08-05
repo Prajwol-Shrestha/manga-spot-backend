@@ -12,12 +12,14 @@ export async function userSeed() {
       name: 'Prajwol',
       email: 'prajwol@example.com',
       password: await bycrypt.hash('Test@123', 10),
+      avatarUrl: null
     },
     {
       username: 'prajwol2',
       name: 'Prajwol2',
       email: 'prajwol2@example.com',
       password: await bycrypt.hash('Test@123', 10),
+      avatarUrl: null
     },
   ];
 
