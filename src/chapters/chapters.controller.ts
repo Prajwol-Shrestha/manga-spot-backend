@@ -15,6 +15,7 @@ import { AuthenticatedRequestJWT } from 'src/types/shared';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import { ApiOkResponse } from '@nestjs/swagger';
 import { ChapterPagesOutputDto } from './dtos/chapter-pages.dto';
+import { getProxiedImageUrl } from 'src/utils/getImage';
 
 export  interface IReadingHistoryEvent {
   userId: string;
@@ -71,7 +72,7 @@ export class ChaptersController {
       chapterId: id,
       chapterNumber: currentChapter?.chapter || '0',
       title: mangaData.title,
-      coverArt: mangaData.coverArt,
+      coverArt: getProxiedImageUrl(mangaData.coverArt),
     };
     if (userId) {
       this.eventEmitter.emit('reading.history', event);

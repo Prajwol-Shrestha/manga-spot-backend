@@ -8,11 +8,11 @@ export class AxiosHttpService {
 
   constructor() {
     this.axiosInstance = axios.create({
-      baseURL: 'https://api.mangadex.org/', 
+      baseURL: 'https://api.mangadex.org/',
       timeout: 5000,
       headers: {
         'User-Agent': 'MangaSpotBackend/1.0',
-        'Accept': 'application/json',
+        Accept: 'application/json',
       },
     });
   }

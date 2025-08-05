@@ -3,6 +3,7 @@ import { MangaData } from 'src/types/manga';
 import { MangaVolumesResponse } from 'src/types/volume';
 import { transformTags } from './tag-utils';
 import { LatestUpdatedChapterDto } from 'src/chapters/dtos/chapter-output.dto';
+import { getProxiedImageUrl } from './getImage';
 
 export const getEnglishOrFirstProperty = (obj: Record<string, any>): string => {
   return obj['en'] || obj[Object.keys(obj)[0]] || '';
@@ -41,9 +42,9 @@ export function mapManga(rawManga: MangaData) {
       meta.artist = relation?.attributes.name || '';
     }
     if (relation.type === 'cover_art' && relation?.attributes) {
-      meta.coverArt =
-        ` https://mangadex.org/covers/${id}/${relation?.attributes.fileName}` ||
-        '';
+      const rawCoverArt = `https://mangadex.org/covers/${id}/${relation?.attributes.fileName}`
+      const proxiedCoverArt = getProxiedImageUrl(rawCoverArt)
+      meta.coverArt = proxiedCoverArt
     }
   });
 
