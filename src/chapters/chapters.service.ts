@@ -12,6 +12,7 @@ import {
 import { PrismaService } from 'src/prisma/prisma.service';
 import { ChapterPagesDto, ChapterPagesOutputDto } from './dtos/chapter-pages.dto';
 import { IReadingHistoryEvent } from './chapters.controller';
+import { getProxiedImageUrl } from 'src/utils/getImage';
 
 @Injectable()
 export class ChaptersService {
@@ -89,12 +90,13 @@ export class ChaptersService {
       const images = chapterData?.chapter?.data?.map(
         (image) => `${baseUrl}/data/${chapterData.chapter.hash}/${image}`,
       );
+      const proxiedImages = images.map(image => getProxiedImageUrl(image));
   
       const finalPayload = {
         result: chapterData.result,
-        count: images.length || 0,
+        count: proxiedImages.length || 0,
         data: {
-          chapterImages: images,
+          chapterImages: proxiedImages,
           mangaDetails: mangaData,
         },
       };
