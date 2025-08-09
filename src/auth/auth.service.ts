@@ -7,10 +7,12 @@ import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { SignupDto } from './dtos/signup.dto';
 import { LoginDto } from './dtos/login.dto';
 import { BaseUserDto } from 'src/user/dtos/user-output.dto';
 import { LoginOutputDto } from './dtos/login-output.dto';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class AuthService {
@@ -18,6 +20,7 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     private prismaService: PrismaService,
+    private mailService: MailService,
   ) {}
 
   async authenticate(input: LoginDto): Promise<BaseUserDto> {
@@ -32,14 +35,11 @@ export class AuthService {
 
   async validateUser(input: LoginDto): Promise<BaseUserDto | null> {
     const user = await this.userService.findUserByName(input.username);
-    const unsafeUser = await this.userService.findUserById((user.id))
+    const unsafeUser = await this.userService.findUserById(user.id);
 
     if (user) {
       const crypeted = await bcrypt.hash(input.password, 10);
-      const isSamePassword = await bcrypt.compare(
-        input.password,
-       crypeted,
-      );
+      const isSamePassword = await bcrypt.compare(input.password, crypeted);
       const { password, ...safeUser } = unsafeUser;
       if (isSamePassword) {
         return safeUser;
@@ -96,5 +96,63 @@ export class AuthService {
     const accessToken = await this.jwtService.signAsync(tokenPayload);
 
     return { accessToken, ...safeUser };
+  }
+
+  async requestResetPassword(email: string) {
+    const user = await this.userService.findUserByEmail(email);
+
+    const token = crypto.randomBytes(32).toString('hex');
+    const hashedToken = await bcrypt.hash(token, 10);
+
+    const expiry = new Date();
+    expiry.setMinutes(expiry.getMinutes() + 15);
+
+    try {
+      await this.prismaService.passwordresetToken.create({
+        data: {
+          userId: user.id,
+          token: hashedToken,
+          expiresAt: expiry,
+        },
+      });
+  
+      const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}&email=${email}`;
+      await this.mailService.sendPasswordReset(email, resetLink);
+  
+      return { message: 'Password reset email sent' };
+    } catch(error) {
+      console.error('Error creating password reset token:', error);
+      throw new Error('Failed to create password reset token');
+    }
+
+  }
+
+  async resetPassword(email: string, token: string, newPassword: string) {
+    const resetToken = await this.prismaService.passwordresetToken.findFirst({
+      where: {
+        user: { email },
+        expiresAt: { gt: new Date() },
+      },
+      include: { user: true },
+    });
+
+    if (!resetToken) throw new BadRequestException('Invalid or expired token');
+
+    const decodedToken = decodeURIComponent(token);
+    const isValid = await bcrypt.compare(decodedToken, resetToken.token);
+    
+    if (!isValid) throw new BadRequestException('Invalid token');
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await this.prismaService.user.update({
+      where: { id: resetToken.userId },
+      data: { password: hashedPassword },
+    });
+
+    await this.prismaService.passwordresetToken.delete({
+      where: { id: resetToken.id },
+    });
+
+    return { message: 'Password reset successful' };
   }
 }
