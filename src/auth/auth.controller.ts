@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Query,
   Req,
   Res,
   UseGuards,
@@ -66,5 +67,35 @@ export class AuthController {
   async logout(@Res({ passthrough: true }) res: Response) {
     // res.clearCookie('accessToken', { path: '/' });
     return { message: 'Logged out' };
+  }
+
+  @Post('request-reset-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Request password reset user',
+    isArray: false,
+  })
+  async requestPasswordReset(@Body('email') email: string) {
+    const response = await this.authService.requestResetPassword(email);
+    return response;
+  }
+
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: 'Reset password user',
+    isArray: false,
+  })
+  async resetPassword(
+    @Body('email') email: string,
+    @Body('token') token: string,
+    @Body('newPassword') newPassword: string,
+  ) {
+    const response = await this.authService.resetPassword(
+      email,
+      token,
+      newPassword,
+    );
+    return response;
   }
 }

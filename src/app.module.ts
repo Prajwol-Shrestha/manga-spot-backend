@@ -16,6 +16,7 @@ import { FileUploadModule } from './file-upload/file-upload.module';
 import { SupabaseModule } from './supabase/supabase.module';
 import { ImageController } from './image/image.controller';
 import { ImageModule } from './image/image.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { ImageModule } from './image/image.module';
     FileUploadModule,
     SupabaseModule,
     ImageModule,
+    MailModule,
   ],
   controllers: [AppController, ImageController],
   providers: [AppService, PrismaService],

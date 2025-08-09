@@ -26,6 +26,7 @@ model User {
 
   bookmarks      Bookmark[]
   readingHistory ReadingHistory[]
+  passwordResetTokens PasswordresetToken[]
 }
 
 model Bookmark {
@@ -49,4 +50,13 @@ model ReadingHistory {
   updatedAt     DateTime @updatedAt
   chapterNumber String
   chapterId     String
+}
+
+
+model PasswordresetToken{
+  id  String @id @default(cuid())
+  userId  String 
+  token String
+  expiresAt DateTime
+  user  User  @relation(fields: [userId], references: [id])
 }

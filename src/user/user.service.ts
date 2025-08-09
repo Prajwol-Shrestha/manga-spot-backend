@@ -35,6 +35,21 @@ export class UserService {
     return user;
   }
 
+  async findUserByEmail(email: string): Promise<BaseUserDto> {
+    const user = await this.PrismaService.user.findUnique({
+      where: {
+        email: email,
+      },
+      omit: {
+        password: true,
+      },
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
+  }
+
   async updateUser(
     userId: string,
     input: UpdateUserDto,
